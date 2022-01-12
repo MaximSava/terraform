@@ -1,0 +1,55 @@
+
+
+
+resource "aws_security_group" "jenkins_rules" {
+  name        = "jenkins"
+  description = "Allow 8080 inbound traffic"
+
+  dynamic "ingress" {
+    for_each = ["80", "443", "8080"]
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+
+    }
+
+  }
+
+  ingress {
+    description = "22 from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  #my ISP range
+  }
+
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  lifecycle {
+    privent_destroy = true  #this settint privent destroy server
+  }
+
+  lifecycle {
+    ignore_changes = ["ami", "user_data"] # What changes to ignore in resources
+  }
+
+  lifecycle {
+    create_before_destroy = true  # Create server before destroy
+  }
+
+
+  tags = {
+    Name = "jenkins_http_8080"
+
+  }
+
+}

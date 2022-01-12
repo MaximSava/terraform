@@ -8,23 +8,34 @@ resource "aws_instance" "My_Ubuntu" {
     instance_type          = "t2.micro"
     vpc_security_group_ids = [aws_security_group.jenkins_rules.id]
     user_data                = file("jenkins_install.sh")
-    key_name               = "my_key"
+    key_name               = "my_key" # aws key
 
 
     tags = {
     Name = "Jenkins-Server"
     Owner = "MaxSa"
     Project = "Terraform Lessons"
-  }
+           }
+
+  lifecycle {
+    prevent_destroy = True  # Prevent destroy instance
+    ignore_changes = ["ami", "user_data"] # ignore changes in code in this fields.
+    create_before_destroy = true # create first instance after what destroy instance
+            }
 
     }
 
 #module "key_pair" {
 #  source = "terraform-aws-modules/key-pair/aws"
 #
-#  key_name   = "maxim-n-virginia2"
+#  key_name   = "n-virginia2"
 #  public_key = "public_key_here"
 #}
+
+resource "aws_eip" "my_static_ip" {
+  instance = aws_instance.My_Ubuntu.id  # elastic ip(static ip)
+}
+
 
 resource "aws_security_group" "jenkins_rules" {
   name        = "jenkins"
@@ -59,7 +70,7 @@ resource "aws_security_group" "jenkins_rules" {
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
-    cidr_blocks      = ["84.0.0.0/8"]  #my ISP range
+    cidr_blocks      = ["0.0.0.0/0"]  #my ISP range
   }
 
 

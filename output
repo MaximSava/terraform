@@ -1,0 +1,17 @@
+output "webserver_output_id" {
+    value =  aws_instance.My_Ubuntu.id
+  }
+
+  output "webserver_public_ip_address" {
+    value = aws_eip.my_static_ip.public_ip
+  }
+
+  output "webserver_sg_id" {
+    value = aws_security_group.jenkins_rules.id
+  }
+
+  output "webserver_sg_arn" {
+    value       = aws_security_group.jenkins_rules.arn
+    description = "this is security arn"
+
+  }
